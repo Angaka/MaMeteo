@@ -20,6 +20,11 @@ import android.view.View;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+import com.projects.crow.mameteo.database.DatabaseHelper;
+import com.projects.crow.mameteo.database.models.Weather;
 import com.projects.crow.mameteo.utils.EnhancedSharedPreferences;
 import com.projects.crow.mameteo.utils.PermissionsUtils;
 
@@ -27,6 +32,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity
     implements View.OnClickListener {
@@ -64,19 +73,20 @@ public class MainActivity extends AppCompatActivity
                                         }
                                     });
 
-        checkPermissions();
-
-        Intent alarm = new Intent(this, WeatherBootReceiver.class);
-        boolean alarmRunning = (PendingIntent.getBroadcast(this, 0, alarm, PendingIntent.FLAG_NO_CREATE) != null);
-        Log.d(TAG, "onCreate: " + alarmRunning);
-        if (!alarmRunning) {
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, alarm, PendingIntent.FLAG_UPDATE_CURRENT);
-            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime(), 1000, pendingIntent);
+        if (isAllPermissionsAccepted()) {
+            Intent alarm = new Intent(this, WeatherBootReceiver.class);
+            boolean alarmRunning = (PendingIntent.getBroadcast(this, 0, alarm, PendingIntent.FLAG_NO_CREATE) != null);
+            Log.d(TAG, "onCreate: " + alarmRunning);
+            if (!alarmRunning) {
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, alarm, PendingIntent.FLAG_UPDATE_CURRENT);
+                AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime(), 1000, pendingIntent);
+            }
+            init();
         }
     }
 
-    private void checkPermissions() {
+    private boolean isAllPermissionsAccepted() {
         SharedPreferences preferences = getBaseContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         EnhancedSharedPreferences enhancedSharedPreferences = new EnhancedSharedPreferences(preferences);
 
@@ -90,14 +100,18 @@ public class MainActivity extends AppCompatActivity
             for (int i = 0; i < unaskedPermissions.size(); i++)
                 permissionsArray[i] = unaskedPermissions.get(i);
             requestPermissions(permissionsArray, mRequestCode);
+            return false;
         } else {
             ArrayList<String> unacceptedPermission = mPermissionsUtils.findUnacceptedPermissions(Arrays.asList(mPermissions));
 
             if (!unacceptedPermission.isEmpty()) {
                 if (!mSnackBarPermissions.isShown())
                     mSnackBarPermissions.show();
+                return false;
             }
         }
+
+        return true;
     }
 
     private void init() {
@@ -111,13 +125,12 @@ public class MainActivity extends AppCompatActivity
                 AlarmManager.INTERVAL_HOUR,
                 pendingIntent);
 
-        Log.d(TAG, "onReceive:");
         SharedPreferences preferences = getBaseContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         EnhancedSharedPreferences enhancedSharedPreferences = new EnhancedSharedPreferences(preferences);
         final EnhancedSharedPreferences.Editor editor = enhancedSharedPreferences.edit();
 
-        double latitude = enhancedSharedPreferences.getDouble("latitude", 0.0);
-        double longitude = enhancedSharedPreferences.getDouble("longitude", 0.0);
+        final double latitude = enhancedSharedPreferences.getDouble("latitude", 0.0);
+        final double longitude = enhancedSharedPreferences.getDouble("longitude", 0.0);
 
         Log.d(TAG, "onReceive: sharedPreferences " + latitude  + " " + longitude);
 
@@ -143,6 +156,32 @@ public class MainActivity extends AppCompatActivity
                     } catch (Exception e) {
                         Log.d(TAG, "onReceive: " + e.getMessage());
                     }
+
+                    DatabaseHelper db = DatabaseHelper.getInstance();
+
+                    db.getWeather(latitude, longitude).enqueue(new Callback<Weather>() {
+                        @Override
+                        public void onResponse(Call<Weather> call, Response<Weather> response) {
+                            Log.d(TAG, "onResponse: " + response.code());
+                            if (response.code() == 200) {
+                                Gson gson = new GsonBuilder().create();
+                                Weather weather = new Weather();
+
+                                try {
+                                    weather = gson.fromJson(response.body().toString(), Weather.class);
+
+                                    Log.d(TAG, "onResponse: " + weather.toString());
+                                } catch (JsonSyntaxException e) {
+                                    Log.d(TAG, "onResponse: " + e.getMessage() + "  ");
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<Weather> call, Throwable t) {
+                            Log.d(TAG, "onFailure: " + t.getMessage());
+                        }
+                    });
                 }
             });
         } catch (SecurityException e) {
@@ -165,6 +204,7 @@ public class MainActivity extends AppCompatActivity
                     } else {
                         if (mSnackBarPermissions.isShown())
                             mSnackBarPermissions.dismiss();
+                        init();
                     }
                 }
                 break;

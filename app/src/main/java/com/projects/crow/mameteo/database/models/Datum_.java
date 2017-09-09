@@ -4,11 +4,10 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by Venom on 07/09/2017.
+ * Created by Venom on 09/09/2017.
  */
 
-public class Currently {
-
+public class Datum_ {
     @SerializedName("time")
     @Expose
     private int time;
@@ -18,15 +17,15 @@ public class Currently {
     @SerializedName("icon")
     @Expose
     private String icon;
-    @SerializedName("nearestStormDistance")
-    @Expose
-    private int nearestStormDistance;
     @SerializedName("temperature")
     @Expose
     private float temperature;
     @SerializedName("apparentTemperature")
     @Expose
     private float apparentTemperature;
+    @SerializedName("dewPoint")
+    @Expose
+    private float dewPoint;
     @SerializedName("humidity")
     @Expose
     private float humidity;
@@ -48,12 +47,12 @@ public class Currently {
     @SerializedName("uvIndex")
     @Expose
     private int uvIndex;
-    @SerializedName("visibility")
-    @Expose
-    private float visibility;
     @SerializedName("ozone")
     @Expose
     private float ozone;
+    @SerializedName("precipType")
+    @Expose
+    private String precipType;
 
     public int getTime() {
         return time;
@@ -79,14 +78,6 @@ public class Currently {
         this.icon = icon;
     }
 
-    public int getNearestStormDistance() {
-        return nearestStormDistance;
-    }
-
-    public void setNearestStormDistance(int nearestStormDistance) {
-        this.nearestStormDistance = nearestStormDistance;
-    }
-
     public float getTemperature() {
         return temperature;
     }
@@ -101,6 +92,14 @@ public class Currently {
 
     public void setApparentTemperature(float apparentTemperature) {
         this.apparentTemperature = apparentTemperature;
+    }
+
+    public float getDewPoint() {
+        return dewPoint;
+    }
+
+    public void setDewPoint(float dewPoint) {
+        this.dewPoint = dewPoint;
     }
 
     public float getHumidity() {
@@ -159,14 +158,6 @@ public class Currently {
         this.uvIndex = uvIndex;
     }
 
-    public float getVisibility() {
-        return visibility;
-    }
-
-    public void setVisibility(float visibility) {
-        this.visibility = visibility;
-    }
-
     public float getOzone() {
         return ozone;
     }
@@ -175,15 +166,23 @@ public class Currently {
         this.ozone = ozone;
     }
 
+    public String getPrecipType() {
+        return precipType;
+    }
+
+    public void setPrecipType(String precipType) {
+        this.precipType = precipType;
+    }
+
     @Override
     public String toString() {
-        return "Currently{" +
+        return "Datum_{" +
                 "time=" + time +
                 ", summary='" + summary + '\'' +
                 ", icon='" + icon + '\'' +
-                ", nearestStormDistance=" + nearestStormDistance +
                 ", temperature=" + temperature +
                 ", apparentTemperature=" + apparentTemperature +
+                ", dewPoint=" + dewPoint +
                 ", humidity=" + humidity +
                 ", pressure=" + pressure +
                 ", windSpeed=" + windSpeed +
@@ -191,8 +190,8 @@ public class Currently {
                 ", windBearing=" + windBearing +
                 ", cloudCover=" + cloudCover +
                 ", uvIndex=" + uvIndex +
-                ", visibility=" + visibility +
                 ", ozone=" + ozone +
+                ", precipType='" + precipType + '\'' +
                 '}';
     }
 }
