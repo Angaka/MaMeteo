@@ -1,6 +1,6 @@
 package com.projects.crow.mameteo.database;
 
-import com.projects.crow.mameteo.database.models.Weather;
+import com.projects.crow.mameteo.database.models.Forecast;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -13,6 +13,6 @@ import retrofit2.http.Path;
 public interface IDarkSkyService {
 
     @GET("{latitude},{longitude}")
-    Call<Weather> getForecast(@Path("latitude") double latitude, @Path("longitude") double longitude);
+    Call<Forecast> getForecast(@Path("latitude") double latitude, @Path("longitude") double longitude);
 
 }

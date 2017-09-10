@@ -11,6 +11,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
@@ -25,11 +26,8 @@ import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 import com.projects.crow.mameteo.database.DatabaseHelper;
-import com.projects.crow.mameteo.database.models.Weather;
+import com.projects.crow.mameteo.database.models.Forecast;
 import com.projects.crow.mameteo.utils.EnhancedSharedPreferences;
 import com.projects.crow.mameteo.utils.MaMeteoUtils;
 import com.projects.crow.mameteo.utils.PermissionsUtils;
@@ -39,20 +37,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 public class MainActivity extends AppCompatActivity
         implements View.OnClickListener {
 
     private static final String TAG = "MainActivity";
-    private static final String PREFS = "myPrefs";
-
-    private static final String[] mPermissions = {"android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"};
-    private static final int mRequestCode = 200;
     private PermissionsUtils mPermissionsUtils;
-    private FusedLocationProviderClient mFusedLocationClient;
+
+    private EnhancedSharedPreferences mPreferences;
 
     private ConstraintLayout mConstraintLayout;
     private Snackbar mSnackBarPermissions;
@@ -61,7 +52,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "onReceive: updateData");
-            updateData();
+            updateLocation();
         }
     };
     private boolean mCheckIfReceiverRegistered = false;
@@ -79,14 +70,18 @@ public class MainActivity extends AppCompatActivity
                         new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                ArrayList<String> unacceptedPermissions = mPermissionsUtils.findUnacceptedPermissions(Arrays.asList(mPermissions));
+                                ArrayList<String> unacceptedPermissions = mPermissionsUtils.findUnacceptedPermissions(Arrays.asList(MaMeteoUtils.PERMISSIONS));
                                 String[] permissionsArray = new String[unacceptedPermissions.size()];
 
                                 for (int i = 0; i < unacceptedPermissions.size(); i++)
                                     permissionsArray[i] = unacceptedPermissions.get(i);
-                                requestPermissions(permissionsArray, mRequestCode);
+                                requestPermissions(permissionsArray, MaMeteoUtils.REQUEST_CODE);
                             }
                         });
+
+        SharedPreferences preferences = getBaseContext().getSharedPreferences(MaMeteoUtils.PREFS, Context.MODE_PRIVATE);
+        mPreferences = new EnhancedSharedPreferences(preferences);
+
         startAlarm();
     }
 
@@ -95,7 +90,7 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         if (!mCheckIfReceiverRegistered) {
             mCheckIfReceiverRegistered = true;
-            LocalBroadcastManager.getInstance(this).registerReceiver(mUpdateDataReceiver, new IntentFilter("UPDATE"));
+            LocalBroadcastManager.getInstance(this).registerReceiver(mUpdateDataReceiver, new IntentFilter(MaMeteoUtils.UPDATE_FORECAST));
         }
     }
 
@@ -116,54 +111,44 @@ public class MainActivity extends AppCompatActivity
                 AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
                 alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime(), 1000 * 5, pendingIntent);
             }
+        } else {
+            if (!mSnackBarPermissions.isShown())
+                mSnackBarPermissions.show();
         }
     }
 
     private boolean isAllPermissionsAccepted() {
-        SharedPreferences preferences = getBaseContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-        EnhancedSharedPreferences enhancedSharedPreferences = new EnhancedSharedPreferences(preferences);
+        mPermissionsUtils = new PermissionsUtils(this, mPreferences);
 
-        mPermissionsUtils = new PermissionsUtils(this, enhancedSharedPreferences);
-
-        ArrayList<String> unaskedPermissions = mPermissionsUtils.findUnAskedPermissions(Arrays.asList(mPermissions));
+        ArrayList<String> unaskedPermissions = mPermissionsUtils.findUnAskedPermissions(Arrays.asList(MaMeteoUtils.PERMISSIONS));
 
         if (!unaskedPermissions.isEmpty()) {
             String[] permissionsArray = new String[unaskedPermissions.size()];
 
             for (int i = 0; i < unaskedPermissions.size(); i++)
                 permissionsArray[i] = unaskedPermissions.get(i);
-            requestPermissions(permissionsArray, mRequestCode);
+            requestPermissions(permissionsArray, MaMeteoUtils.REQUEST_CODE);
             return false;
         } else {
-            ArrayList<String> unacceptedPermission = mPermissionsUtils.findUnacceptedPermissions(Arrays.asList(mPermissions));
-
-            if (!unacceptedPermission.isEmpty()) {
-                if (!mSnackBarPermissions.isShown())
-                    mSnackBarPermissions.show();
+            ArrayList<String> unacceptedPermission = mPermissionsUtils.findUnacceptedPermissions(Arrays.asList(MaMeteoUtils.PERMISSIONS));
+            if (!unacceptedPermission.isEmpty())
                 return false;
-            }
         }
 
         return true;
     }
 
-    private void updateData() {
-        SharedPreferences preferences = getBaseContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-        EnhancedSharedPreferences enhancedSharedPreferences = new EnhancedSharedPreferences(preferences);
-        final EnhancedSharedPreferences.Editor editor = enhancedSharedPreferences.edit();
+    private void updateLocation() {
+        final EnhancedSharedPreferences.Editor editor = mPreferences.edit();
 
-        final double latitude = enhancedSharedPreferences.getDouble("latitude", 0.0);
-        final double longitude = enhancedSharedPreferences.getDouble("longitude", 0.0);
-
-        Log.d(TAG, "onReceive: sharedPreferences " + latitude + " " + longitude);
-
-        if (!MaMeteoUtils.isProviderEnabled(this, LocationManager.GPS_PROVIDER) && !MaMeteoUtils.isInternetConnectionAvailable(this)) {
+        if (!MaMeteoUtils.isProviderEnabled(this, LocationManager.GPS_PROVIDER)
+                && !MaMeteoUtils.isInternetConnectionAvailable(this)) {
             Toast.makeText(this, "No provider enabled", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "Enabled", Toast.LENGTH_SHORT).show();
             try {
-                mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-                mFusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+                FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+                fusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
                         Log.d(TAG, "onSuccess: " + location.getLatitude() + " " + location.getLongitude());
@@ -174,58 +159,44 @@ public class MainActivity extends AppCompatActivity
                             if (!addressList.isEmpty()) {
                                 Address nearestCity = addressList.get(0);
                                 if (nearestCity.hasLatitude() && nearestCity.hasLongitude()) {
-                                    Log.d(TAG, "onReceive: nearest " + nearestCity.getLatitude() + " " + nearestCity.getLongitude());
-                                    editor.putDouble("latitude", nearestCity.getLatitude());
-                                    editor.putDouble("longitude", nearestCity.getLongitude());
+                                    editor.putString(MaMeteoUtils.CITYNAME, nearestCity.getAddressLine(0));
+                                    editor.putString(MaMeteoUtils.STATENAME, nearestCity.getAddressLine(1));
+                                    editor.putString(MaMeteoUtils.COUNTRYNAME, nearestCity.getAddressLine(2));
+                                    editor.putDouble(MaMeteoUtils.LATITUDE, nearestCity.getLatitude());
+                                    editor.putDouble(MaMeteoUtils.LONGITUDE, nearestCity.getLongitude());
                                     editor.commit();
                                 }
                             }
                         } catch (Exception e) {
                             Log.d(TAG, "onReceive: " + e.getMessage());
                         }
-
-                        DatabaseHelper db = DatabaseHelper.getInstance();
-
-                        db.getWeather(latitude, longitude).enqueue(new Callback<Weather>() {
-                            @Override
-                            public void onResponse(Call<Weather> call, Response<Weather> response) {
-                                Log.d(TAG, "onResponse: " + response.code());
-                                if (response.code() == 200) {
-                                    Gson gson = new GsonBuilder().create();
-                                    Weather weather = new Weather();
-
-                                    try {
-                                        weather = gson.fromJson(response.body().toString(), Weather.class);
-
-                                        Log.d(TAG, "onResponse: " + weather.toString());
-                                    } catch (JsonSyntaxException e) {
-                                        Log.d(TAG, "onResponse: " + e.getMessage() + "  ");
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<Weather> call, Throwable t) {
-                                Log.d(TAG, "onFailure: " + t.getMessage());
-                            }
-                        });
                     }
                 });
             } catch (SecurityException e) {
                 Log.d(TAG, "onReceive: " + e.getMessage());
             }
         }
+
+        double latitude = mPreferences.getDouble(MaMeteoUtils.LATITUDE, 0.0);
+        double longitude = mPreferences.getDouble(MaMeteoUtils.LONGITUDE, 0.0);
+
+        UpdateForecastTask updateForecastTask = new UpdateForecastTask(latitude, longitude);
+        updateForecastTask.execute();
+    }
+
+    private void updateUI(Forecast forecast) {
+
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
-            case mRequestCode:
+            case MaMeteoUtils.REQUEST_CODE:
                 if (grantResults.length > 0) {
                     for (int i = 0; i < grantResults.length; i++)
                         mPermissionsUtils.markAsAsked(permissions[i]);
 
-                    ArrayList<String> unacceptedPermissions = mPermissionsUtils.findUnacceptedPermissions(Arrays.asList(mPermissions));
+                    ArrayList<String> unacceptedPermissions = mPermissionsUtils.findUnacceptedPermissions(Arrays.asList(MaMeteoUtils.PERMISSIONS));
                     if (!unacceptedPermissions.isEmpty()) {
                         if (!mSnackBarPermissions.isShown())
                             mSnackBarPermissions.show();
@@ -242,6 +213,32 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+        }
+    }
+
+    private class UpdateForecastTask extends AsyncTask<Void, Void, Forecast> {
+
+        private double mLatitude;
+        private double mLongitude;
+
+        public UpdateForecastTask(double latitude, double longitude) {
+            mLatitude = latitude;
+            mLongitude = longitude;
+        }
+
+        @Override
+        protected Forecast doInBackground(Void... voids) {
+            DatabaseHelper db = DatabaseHelper.getInstance();
+
+            if (!MaMeteoUtils.isProviderEnabled(MainActivity.this, LocationManager.GPS_PROVIDER)
+                    && !MaMeteoUtils.isInternetConnectionAvailable(MainActivity.this))
+                return db.getLastForecast();
+            return db.getForecast(mLatitude, mLongitude);
+        }
+
+        @Override
+        protected void onPostExecute(Forecast forecast) {
+            updateUI(forecast);
         }
     }
 }

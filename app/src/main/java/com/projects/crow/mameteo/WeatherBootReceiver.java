@@ -4,7 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
+
+import com.projects.crow.mameteo.utils.MaMeteoUtils;
 
 /**
  * Created by Venom on 09/09/2017.
@@ -16,7 +17,7 @@ public class WeatherBootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Intent in = new Intent();
-        in.setAction("UPDATE");
+        in.setAction(MaMeteoUtils.UPDATE_FORECAST);
         LocalBroadcastManager.getInstance(context).sendBroadcast(in);
     }
 

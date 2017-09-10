@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by Venom on 07/09/2017.
  */
 
-public class Weather {
+public class Forecast {
     @SerializedName("latitude")
     @Expose
     private float latitude;
@@ -110,7 +110,7 @@ public class Weather {
 
     @Override
     public String toString() {
-        return "Weather{" +
+        return "Forecast{" +
                 "latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", timezone='" + timezone + '\'' +
