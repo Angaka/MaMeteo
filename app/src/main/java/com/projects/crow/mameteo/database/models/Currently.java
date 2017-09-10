@@ -11,49 +11,49 @@ public class Currently {
 
     @SerializedName("time")
     @Expose
-    private int time;
+    private int time = 0;
     @SerializedName("summary")
     @Expose
-    private String summary;
+    private String summary = "";
     @SerializedName("icon")
     @Expose
-    private String icon;
+    private String icon = "";
     @SerializedName("nearestStormDistance")
     @Expose
-    private int nearestStormDistance;
+    private int nearestStormDistance = 0;
     @SerializedName("temperature")
     @Expose
-    private float temperature;
+    private float temperature = 0;
     @SerializedName("apparentTemperature")
     @Expose
-    private float apparentTemperature;
+    private float apparentTemperature = 0;
     @SerializedName("humidity")
     @Expose
-    private float humidity;
+    private float humidity = 0;
     @SerializedName("pressure")
     @Expose
-    private float pressure;
+    private float pressure = 0;
     @SerializedName("windSpeed")
     @Expose
-    private float windSpeed;
+    private float windSpeed = 0;
     @SerializedName("windGust")
     @Expose
-    private float windGust;
+    private float windGust = 0;
     @SerializedName("windBearing")
     @Expose
-    private int windBearing;
+    private int windBearing = 0;
     @SerializedName("cloudCover")
     @Expose
-    private float cloudCover;
+    private float cloudCover = 0;
     @SerializedName("uvIndex")
     @Expose
-    private int uvIndex;
+    private int uvIndex = 0;
     @SerializedName("visibility")
     @Expose
-    private float visibility;
+    private float visibility = 0;
     @SerializedName("ozone")
     @Expose
-    private float ozone;
+    private float ozone = 0;
 
     public int getTime() {
         return time;

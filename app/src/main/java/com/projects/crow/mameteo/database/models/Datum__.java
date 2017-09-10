@@ -10,118 +10,118 @@ import com.google.gson.annotations.SerializedName;
 public class Datum__ {
     @SerializedName("time")
     @Expose
-    private int time;
+    private int time = 0;
     @SerializedName("summary")
     @Expose
-    private String summary;
+    private String summary = "";
     @SerializedName("icon")
     @Expose
-    private String icon;
+    private String icon = "";
     @SerializedName("sunriseTime")
     @Expose
-    private int sunriseTime;
+    private int sunriseTime = 0;
     @SerializedName("sunsetTime")
     @Expose
-    private int sunsetTime;
+    private int sunsetTime = 0;
     @SerializedName("moonPhase")
     @Expose
-    private float moonPhase;
+    private float moonPhase = 0;
     @SerializedName("precipIntensity")
     @Expose
-    private float precipIntensity;
+    private float precipIntensity = 0;
     @SerializedName("precipIntensityMax")
     @Expose
-    private float precipIntensityMax;
+    private float precipIntensityMax = 0;
     @SerializedName("precipIntensityMaxTime")
     @Expose
-    private int precipIntensityMaxTime;
+    private int precipIntensityMaxTime = 0;
     @SerializedName("precipProbability")
     @Expose
-    private float precipProbability;
+    private float precipProbability = 0;
     @SerializedName("precipType")
     @Expose
-    private String precipType;
+    private String precipType = "";
     @SerializedName("temperatureHigh")
     @Expose
-    private float temperatureHigh;
+    private float temperatureHigh = 0;
     @SerializedName("temperatureHighTime")
     @Expose
-    private int temperatureHighTime;
+    private int temperatureHighTime = 0;
     @SerializedName("temperatureLow")
     @Expose
-    private float temperatureLow;
+    private float temperatureLow = 0;
     @SerializedName("temperatureLowTime")
     @Expose
-    private int temperatureLowTime;
+    private int temperatureLowTime = 0;
     @SerializedName("apparentTemperatureHigh")
     @Expose
-    private float apparentTemperatureHigh;
+    private float apparentTemperatureHigh = 0;
     @SerializedName("apparentTemperatureHighTime")
     @Expose
-    private int apparentTemperatureHighTime;
+    private int apparentTemperatureHighTime = 0;
     @SerializedName("apparentTemperatureLow")
     @Expose
-    private float apparentTemperatureLow;
+    private float apparentTemperatureLow = 0;
     @SerializedName("apparentTemperatureLowTime")
     @Expose
-    private int apparentTemperatureLowTime;
+    private int apparentTemperatureLowTime = 0;
     @SerializedName("dewPoint")
     @Expose
-    private float dewPoint;
+    private float dewPoint = 0;
     @SerializedName("humidity")
     @Expose
-    private float humidity;
+    private float humidity = 0;
     @SerializedName("pressure")
     @Expose
-    private float pressure;
+    private float pressure = 0;
     @SerializedName("windSpeed")
     @Expose
-    private float windSpeed;
+    private float windSpeed = 0;
     @SerializedName("windGust")
     @Expose
-    private float windGust;
+    private float windGust = 0;
     @SerializedName("windGustTime")
     @Expose
-    private int windGustTime;
+    private int windGustTime = 0;
     @SerializedName("windBearing")
     @Expose
-    private int windBearing;
+    private int windBearing = 0;
     @SerializedName("cloudCover")
     @Expose
-    private float cloudCover;
+    private float cloudCover = 0;
     @SerializedName("uvIndex")
     @Expose
-    private int uvIndex;
+    private int uvIndex = 0;
     @SerializedName("uvIndexTime")
     @Expose
-    private int uvIndexTime;
+    private int uvIndexTime = 0;
     @SerializedName("ozone")
     @Expose
-    private float ozone;
+    private float ozone = 0;
     @SerializedName("temperatureMin")
     @Expose
-    private float temperatureMin;
+    private float temperatureMin = 0;
     @SerializedName("temperatureMinTime")
     @Expose
-    private int temperatureMinTime;
+    private int temperatureMinTime = 0;
     @SerializedName("temperatureMax")
     @Expose
-    private float temperatureMax;
+    private float temperatureMax = 0;
     @SerializedName("temperatureMaxTime")
     @Expose
-    private int temperatureMaxTime;
+    private int temperatureMaxTime = 0;
     @SerializedName("apparentTemperatureMin")
     @Expose
-    private float apparentTemperatureMin;
+    private float apparentTemperatureMin = 0;
     @SerializedName("apparentTemperatureMinTime")
     @Expose
-    private int apparentTemperatureMinTime;
+    private int apparentTemperatureMinTime = 0;
     @SerializedName("apparentTemperatureMax")
     @Expose
-    private float apparentTemperatureMax;
+    private float apparentTemperatureMax = 0;
     @SerializedName("apparentTemperatureMaxTime")
     @Expose
-    private int apparentTemperatureMaxTime;
+    private int apparentTemperatureMaxTime = 0;
 
     public int getTime() {
         return time;

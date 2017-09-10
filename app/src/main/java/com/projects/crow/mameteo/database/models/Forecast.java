@@ -10,31 +10,31 @@ import com.google.gson.annotations.SerializedName;
 public class Forecast {
     @SerializedName("latitude")
     @Expose
-    private float latitude;
+    private float latitude = 0;
     @SerializedName("longitude")
     @Expose
-    private float longitude;
+    private float longitude = 0;
     @SerializedName("timezone")
     @Expose
-    private String timezone;
+    private String timezone = "";
     @SerializedName("currently")
     @Expose
-    private Currently currently;
+    private Currently currently = new Currently();
     @SerializedName("minutely")
     @Expose
-    private Minutely minutely;
+    private Minutely minutely = new Minutely();
     @SerializedName("hourly")
     @Expose
-    private Hourly hourly;
+    private Hourly hourly = new Hourly();
     @SerializedName("daily")
     @Expose
-    private Daily daily;
+    private Daily daily = new Daily();
     @SerializedName("flags")
     @Expose
-    private Flags flags;
+    private Flags flags = new Flags();
     @SerializedName("offset")
     @Expose
-    private int offset;
+    private int offset = 0;
 
     public float getLatitude() {
         return latitude;

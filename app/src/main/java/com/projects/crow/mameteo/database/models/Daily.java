@@ -3,6 +3,7 @@ package com.projects.crow.mameteo.database.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,13 +13,13 @@ import java.util.List;
 public class Daily {
     @SerializedName("summary")
     @Expose
-    private String summary;
+    private String summary = "";
     @SerializedName("icon")
     @Expose
-    private String icon;
+    private String icon = "";
     @SerializedName("data")
     @Expose
-    private List<Datum__> data = null;
+    private List<Datum__> data = new ArrayList<>();
 
     public String getSummary() {
         return summary;

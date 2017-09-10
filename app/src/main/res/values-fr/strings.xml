@@ -3,4 +3,5 @@
 
     <string name="permissions_request">Vous devez accepter une ou plusieurs permissions</string>
     <string name="see_permissions">Voir permissions</string>
+    <string name="gps_or_internet_disabled">GPS et/ou internet non activé</string>
 </resources>

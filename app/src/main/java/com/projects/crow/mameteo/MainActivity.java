@@ -105,11 +105,12 @@ public class MainActivity extends AppCompatActivity
         if (isAllPermissionsAccepted()) {
             Intent alarm = new Intent(MainActivity.this, WeatherBootReceiver.class);
             boolean alarmRunning = (PendingIntent.getBroadcast(this, 0, alarm, PendingIntent.FLAG_NO_CREATE) != null);
-            Log.d(TAG, "startAlarm: " + alarmRunning);
             if (!alarmRunning) {
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, alarm, PendingIntent.FLAG_UPDATE_CURRENT);
                 AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-                alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime(), 1000 * 5, pendingIntent);
+                if (alarmManager != null) {
+                    alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime(), 1000 * 5, pendingIntent);
+                }
             }
         } else {
             if (!mSnackBarPermissions.isShown())
@@ -139,19 +140,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateLocation() {
-        final EnhancedSharedPreferences.Editor editor = mPreferences.edit();
-
-        if (!MaMeteoUtils.isProviderEnabled(this, LocationManager.GPS_PROVIDER)
-                && !MaMeteoUtils.isInternetConnectionAvailable(this)) {
-            Toast.makeText(this, "No provider enabled", Toast.LENGTH_SHORT).show();
+        if (!isLocationEnabled()) {
+            Toast.makeText(this, R.string.gps_or_internet_disabled, Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "Enabled", Toast.LENGTH_SHORT).show();
             try {
                 FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
                 fusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
-                        Log.d(TAG, "onSuccess: " + location.getLatitude() + " " + location.getLongitude());
                         Geocoder geocoder = new Geocoder(getBaseContext(), Locale.getDefault());
                         try {
                             List<Address> addressList = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
@@ -159,6 +155,7 @@ public class MainActivity extends AppCompatActivity
                             if (!addressList.isEmpty()) {
                                 Address nearestCity = addressList.get(0);
                                 if (nearestCity.hasLatitude() && nearestCity.hasLongitude()) {
+                                    EnhancedSharedPreferences.Editor editor = mPreferences.edit();
                                     editor.putString(MaMeteoUtils.CITYNAME, nearestCity.getAddressLine(0));
                                     editor.putString(MaMeteoUtils.STATENAME, nearestCity.getAddressLine(1));
                                     editor.putString(MaMeteoUtils.COUNTRYNAME, nearestCity.getAddressLine(2));
@@ -180,12 +177,12 @@ public class MainActivity extends AppCompatActivity
         double latitude = mPreferences.getDouble(MaMeteoUtils.LATITUDE, 0.0);
         double longitude = mPreferences.getDouble(MaMeteoUtils.LONGITUDE, 0.0);
 
-        UpdateForecastTask updateForecastTask = new UpdateForecastTask(latitude, longitude);
+        UpdateForecastTask updateForecastTask = new UpdateForecastTask(this, latitude, longitude);
         updateForecastTask.execute();
     }
 
-    private void updateUI(Forecast forecast) {
-
+    private static void updateUI(Forecast forecast) {
+        Log.d(TAG, "updateUI: " + forecast.getCurrently().getTemperature());
     }
 
     @Override
@@ -216,12 +213,20 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private boolean isLocationEnabled() {
+        boolean isProviderEnabled = MaMeteoUtils.isProviderEnabled(this, LocationManager.GPS_PROVIDER);
+        boolean isInternetConnected = MaMeteoUtils.isInternetConnectionAvailable(this);
+        return isProviderEnabled && isInternetConnected;
+    }
+
     private class UpdateForecastTask extends AsyncTask<Void, Void, Forecast> {
 
+        private Context mContext;
         private double mLatitude;
         private double mLongitude;
 
-        public UpdateForecastTask(double latitude, double longitude) {
+        private UpdateForecastTask(Context context, double latitude, double longitude) {
+            mContext = context;
             mLatitude = latitude;
             mLongitude = longitude;
         }
@@ -230,10 +235,11 @@ public class MainActivity extends AppCompatActivity
         protected Forecast doInBackground(Void... voids) {
             DatabaseHelper db = DatabaseHelper.getInstance();
 
-            if (!MaMeteoUtils.isProviderEnabled(MainActivity.this, LocationManager.GPS_PROVIDER)
-                    && !MaMeteoUtils.isInternetConnectionAvailable(MainActivity.this))
-                return db.getLastForecast();
-            return db.getForecast(mLatitude, mLongitude);
+            if (!isLocationEnabled()) {
+                Log.d(TAG, "doInBackground: ");
+                return db.getLastForecast(mContext);
+            }
+            return db.getForecast(mContext, mLatitude, mLongitude);
         }
 
         @Override

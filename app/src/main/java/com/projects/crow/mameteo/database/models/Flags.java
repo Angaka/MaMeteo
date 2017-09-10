@@ -3,6 +3,7 @@ package com.projects.crow.mameteo.database.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,13 +13,13 @@ import java.util.List;
 public class Flags {
     @SerializedName("sources")
     @Expose
-    private List<String> sources = null;
+    private List<String> sources = new ArrayList<>();
     @SerializedName("isd-stations")
     @Expose
-    private List<String> isdStations = null;
+    private List<String> isdStations = new ArrayList<>();
     @SerializedName("units")
     @Expose
-    private String units;
+    private String units = "";
 
     public List<String> getSources() {
         return sources;

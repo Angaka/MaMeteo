@@ -11,7 +11,7 @@ public class Datum {
 
     @SerializedName("time")
     @Expose
-    private int time;
+    private int time = 0;
 
     public int getTime() {
         return time;
