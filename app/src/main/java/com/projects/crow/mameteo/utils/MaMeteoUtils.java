@@ -7,6 +7,7 @@ import android.net.NetworkInfo;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.projects.crow.mameteo.R;
 import com.projects.crow.mameteo.database.models.Forecast;
 
 import java.io.BufferedReader;
@@ -15,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.text.DecimalFormat;
 
 /**
  * Created by Venom on 10/09/2017.
@@ -88,5 +90,35 @@ public class MaMeteoUtils {
             e.printStackTrace();
         }
         return new Forecast();
+    }
+
+    public static String fahrenheitToCelsius(double temperatureInFahrenheit) {
+        double celsius = (temperatureInFahrenheit - 32) / 1.8;
+        return String.valueOf(new DecimalFormat("#").format(celsius)) + " C°";
+    }
+
+    public static int getIconByName(Context context, String icon) {
+        switch (icon) {
+            case "clear-day":
+                return R.drawable.ic_clear_day;
+            case "clear-night":
+                return R.drawable.ic_clear_night;
+            case "rain":
+                return R.drawable.ic_rain;
+            case "snow":
+                return R.drawable.ic_snow;
+            case "wind":
+                return R.drawable.ic_wind;
+            case "fog":
+                return R.drawable.ic_fog;
+            case "cloudy":
+                return R.drawable.ic_cloudy;
+            case "partly-cloudy-day":
+                return R.drawable.ic_partly_cloudy_day;
+            case "partly-cloudy-night":
+                return R.drawable.ic_partly_cloudy_night;
+            default:
+                return R.drawable.ic_clear_day;
+        }
     }
 }

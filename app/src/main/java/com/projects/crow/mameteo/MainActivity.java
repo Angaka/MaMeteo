@@ -15,12 +15,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -45,7 +47,10 @@ public class MainActivity extends AppCompatActivity
 
     private EnhancedSharedPreferences mPreferences;
 
-    private ConstraintLayout mConstraintLayout;
+    private ImageView mIvIcon;
+    private TextView mTvTemperature;
+    private TextView mTvSummary;
+    private RecyclerView mRvDaily;
     private Snackbar mSnackBarPermissions;
 
     private BroadcastReceiver mUpdateDataReceiver = new BroadcastReceiver() {
@@ -62,10 +67,12 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mConstraintLayout = findViewById(R.id.constraint_layout);
-
+        mIvIcon = findViewById(R.id.image_view_icon);
+        mTvTemperature = findViewById(R.id.text_view_temperature);
+        mTvSummary = findViewById(R.id.text_view_summary);
+        mRvDaily = findViewById(R.id.recycler_view_daily);
         mSnackBarPermissions = Snackbar
-                .make(mConstraintLayout, R.string.permissions_request, Snackbar.LENGTH_INDEFINITE)
+                .make(getWindow().getDecorView().getRootView(), R.string.permissions_request, Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.see_permissions,
                         new View.OnClickListener() {
                             @Override
@@ -181,8 +188,10 @@ public class MainActivity extends AppCompatActivity
         updateForecastTask.execute();
     }
 
-    private static void updateUI(Forecast forecast) {
-        Log.d(TAG, "updateUI: " + forecast.getCurrently().getTemperature());
+    private void updateUI(Forecast forecast) {
+        mIvIcon.setImageResource(MaMeteoUtils.getIconByName(this, forecast.getCurrently().getIcon()));
+        mTvTemperature.setText(MaMeteoUtils.fahrenheitToCelsius(forecast.getCurrently().getTemperature()));
+        mTvSummary.setText(forecast.getCurrently().getSummary());
     }
 
     @Override

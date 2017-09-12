@@ -1,15 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/constraint_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@color/colorPrimary"
     tools:context="com.projects.crow.mameteo.MainActivity">
 
-    <com.thbs.skycons.library.SkyconView
-        android:id="@+id/skycon_view"
+    <ImageView
+        android:id="@+id/image_view_icon"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/ic_partly_cloudy_day"/>
+    <TextView
+        android:id="@+id/text_view_temperature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="0°"
+        android:textAlignment="center"
+        android:textSize="30sp"
+        android:textColor="@android:color/white"/>
+    <TextView
+        android:id="@+id/text_view_summary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Summary"
+        android:textColor="@android:color/white"
+        android:textSize="23sp"/>
 
-</android.support.constraint.ConstraintLayout>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view_daily"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"/>
+</LinearLayout>
