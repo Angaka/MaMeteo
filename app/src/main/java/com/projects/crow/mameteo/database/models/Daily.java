@@ -19,7 +19,7 @@ public class Daily {
     private String icon = "";
     @SerializedName("data")
     @Expose
-    private List<Datum__> data = new ArrayList<>();
+    private List<Datum> data = new ArrayList<>();
 
     public String getSummary() {
         return summary;
@@ -37,11 +37,11 @@ public class Daily {
         this.icon = icon;
     }
 
-    public List<Datum__> getData() {
+    public List<Datum> getData() {
         return data;
     }
 
-    public void setData(List<Datum__> data) {
+    public void setData(List<Datum> data) {
         this.data = data;
     }
 

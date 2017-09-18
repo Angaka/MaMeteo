@@ -4,37 +4,88 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
     android:background="@color/colorPrimary"
-    tools:context="com.projects.crow.mameteo.MainActivity">
+    android:orientation="vertical"
+    android:padding="@dimen/padding_mameteo"
+    tools:context="com.projects.crow.mameteo.activities.MainActivity">
+
+
+    <TextView
+        android:id="@+id/text_view_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:fontFamily="sans-serif-medium"
+        android:text="Location"
+        android:textAllCaps="true"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="@dimen/default_text_size"
+        android:textStyle="bold" />
 
     <ImageView
         android:id="@+id/image_view_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:src="@drawable/ic_partly_cloudy_day"/>
+        android:src="@drawable/ic_partly_cloudy_day" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/text_view_summary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Summary"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="@dimen/default_text_size" />
+            <TextView
+                android:id="@+id/text_view_windspeed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Windspeed"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="@dimen/small_text_size" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/text_view_temperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:textStyle="bold"
+            android:text="0°"
+            android:textAlignment="center"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="@dimen/currently_temperature_text_size" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="20dp"
+        android:layout_height="2dp"
+        android:layout_gravity="center"
+        android:background="@color/colorPrimaryDark"/>
+    
     <TextView
-        android:id="@+id/text_view_temperature"
+        android:id="@+id/text_view_period"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="0°"
-        android:textAlignment="center"
-        android:textSize="30sp"
-        android:textColor="@android:color/white"/>
-    <TextView
-        android:id="@+id/text_view_summary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Summary"
-        android:textColor="@android:color/white"
-        android:textSize="23sp"/>
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="5dp"
+        android:textColor="@color/grey"
+        android:textSize="@dimen/small_text_size" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view_daily"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"/>
+        android:orientation="horizontal" />
 </LinearLayout>

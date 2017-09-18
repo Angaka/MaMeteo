@@ -1,4 +1,4 @@
-package com.projects.crow.mameteo;
+package com.projects.crow.mameteo.activities;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -13,11 +13,12 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -28,8 +29,13 @@ import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.projects.crow.mameteo.R;
+import com.projects.crow.mameteo.WeatherBootReceiver;
+import com.projects.crow.mameteo.adapters.PeriodAdapter;
 import com.projects.crow.mameteo.database.DatabaseHelper;
+import com.projects.crow.mameteo.database.models.Datum;
 import com.projects.crow.mameteo.database.models.Forecast;
+import com.projects.crow.mameteo.utils.DateUtils;
 import com.projects.crow.mameteo.utils.EnhancedSharedPreferences;
 import com.projects.crow.mameteo.utils.MaMeteoUtils;
 import com.projects.crow.mameteo.utils.PermissionsUtils;
@@ -47,10 +53,17 @@ public class MainActivity extends AppCompatActivity
 
     private EnhancedSharedPreferences mPreferences;
 
+    private TextView mTvLocation;
     private ImageView mIvIcon;
-    private TextView mTvTemperature;
     private TextView mTvSummary;
+    private TextView mTvWindspeed;
+    private TextView mTvTemperature;
+
+    private TextView mTvPeriod;
     private RecyclerView mRvDaily;
+
+    private PeriodAdapter mPeriodAdapter;
+
     private Snackbar mSnackBarPermissions;
 
     private BroadcastReceiver mUpdateDataReceiver = new BroadcastReceiver() {
@@ -67,10 +80,22 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mTvLocation = findViewById(R.id.text_view_location);
         mIvIcon = findViewById(R.id.image_view_icon);
-        mTvTemperature = findViewById(R.id.text_view_temperature);
         mTvSummary = findViewById(R.id.text_view_summary);
+        mTvWindspeed = findViewById(R.id.text_view_windspeed);
+        mTvTemperature = findViewById(R.id.text_view_temperature);
+
+        mTvPeriod = findViewById(R.id.text_view_period);
+        mTvPeriod.setText(MaMeteoUtils.HOURLY);
         mRvDaily = findViewById(R.id.recycler_view_daily);
+        mPeriodAdapter = new PeriodAdapter(this, new ArrayList<Datum>(), MaMeteoUtils.HOURLY);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        mRvDaily.setLayoutManager(layoutManager);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, layoutManager.getOrientation());
+        mRvDaily.addItemDecoration(dividerItemDecoration);
+        mRvDaily.setAdapter(mPeriodAdapter);
+
         mSnackBarPermissions = Snackbar
                 .make(getWindow().getDecorView().getRootView(), R.string.permissions_request, Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.see_permissions,
@@ -110,13 +135,14 @@ public class MainActivity extends AppCompatActivity
 
     private void startAlarm() {
         if (isAllPermissionsAccepted()) {
+            updateLocation();
             Intent alarm = new Intent(MainActivity.this, WeatherBootReceiver.class);
             boolean alarmRunning = (PendingIntent.getBroadcast(this, 0, alarm, PendingIntent.FLAG_NO_CREATE) != null);
             if (!alarmRunning) {
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, alarm, PendingIntent.FLAG_UPDATE_CURRENT);
                 AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
                 if (alarmManager != null) {
-                    alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime(), 1000 * 5, pendingIntent);
+                    alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, DateUtils.getNextHour().getTime(), AlarmManager.INTERVAL_HOUR, pendingIntent);
                 }
             }
         } else {
@@ -148,6 +174,7 @@ public class MainActivity extends AppCompatActivity
 
     private void updateLocation() {
         if (!isLocationEnabled()) {
+            launchTask();
             Toast.makeText(this, R.string.gps_or_internet_disabled, Toast.LENGTH_SHORT).show();
         } else {
             try {
@@ -168,7 +195,9 @@ public class MainActivity extends AppCompatActivity
                                     editor.putString(MaMeteoUtils.COUNTRYNAME, nearestCity.getAddressLine(2));
                                     editor.putDouble(MaMeteoUtils.LATITUDE, nearestCity.getLatitude());
                                     editor.putDouble(MaMeteoUtils.LONGITUDE, nearestCity.getLongitude());
-                                    editor.commit();
+                                    editor.apply();
+
+                                    launchTask();
                                 }
                             }
                         } catch (Exception e) {
@@ -180,18 +209,25 @@ public class MainActivity extends AppCompatActivity
                 Log.d(TAG, "onReceive: " + e.getMessage());
             }
         }
+    }
 
+    private void launchTask() {
         double latitude = mPreferences.getDouble(MaMeteoUtils.LATITUDE, 0.0);
         double longitude = mPreferences.getDouble(MaMeteoUtils.LONGITUDE, 0.0);
 
-        UpdateForecastTask updateForecastTask = new UpdateForecastTask(this, latitude, longitude);
+        Log.d(TAG, "updateLocation: " + latitude + " " + longitude);
+        UpdateForecastTask updateForecastTask = new UpdateForecastTask(MainActivity.this, latitude, longitude);
         updateForecastTask.execute();
     }
 
     private void updateUI(Forecast forecast) {
+        mTvLocation.setText(forecast.getTimezone());
         mIvIcon.setImageResource(MaMeteoUtils.getIconByName(this, forecast.getCurrently().getIcon()));
-        mTvTemperature.setText(MaMeteoUtils.fahrenheitToCelsius(forecast.getCurrently().getTemperature()));
         mTvSummary.setText(forecast.getCurrently().getSummary());
+//        mTvWindspeed = findViewById(R.id.text_view_windspeed);
+        mTvTemperature.setText(MaMeteoUtils.fahrenheitToCelsius(forecast.getCurrently().getTemperature()));
+
+        mPeriodAdapter.updateDatas(forecast.getHourly().getData());
     }
 
     @Override
@@ -248,6 +284,7 @@ public class MainActivity extends AppCompatActivity
                 Log.d(TAG, "doInBackground: ");
                 return db.getLastForecast(mContext);
             }
+            Log.d(TAG, "doInBackground: lat long " + mLatitude +  " " + mLongitude);
             return db.getForecast(mContext, mLatitude, mLongitude);
         }
 

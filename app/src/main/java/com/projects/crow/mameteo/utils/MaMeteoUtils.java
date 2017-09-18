@@ -37,6 +37,11 @@ public class MaMeteoUtils {
     public static final String COUNTRYNAME = "countryName";
     public static final String LATITUDE = "latitude";
     public static final String LONGITUDE = "longitude";
+
+    public static final String CURRENTLY = "currently";
+    public static final String DAILY = "daily";
+    public static final String HOURLY = "hourly";
+
     public static final String UPDATE_FORECAST = "updateForecast";
 
     public static boolean isInternetConnectionAvailable(Context context) {

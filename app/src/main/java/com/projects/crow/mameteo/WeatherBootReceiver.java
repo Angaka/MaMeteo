@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.projects.crow.mameteo.utils.MaMeteoUtils;
 
@@ -16,6 +17,7 @@ public class WeatherBootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.d(TAG, "onReceive: updateHour ");
         Intent in = new Intent();
         in.setAction(MaMeteoUtils.UPDATE_FORECAST);
         LocalBroadcastManager.getInstance(context).sendBroadcast(in);
