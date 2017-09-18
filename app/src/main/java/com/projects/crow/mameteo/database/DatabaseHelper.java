@@ -43,7 +43,7 @@ public class DatabaseHelper {
         return mInstance;
     }
 
-    public Forecast mgetLastForecast(Context context) {
+    public Forecast getLastForecast(Context context) {
         mForecast = MaMeteoUtils.readFromFile(context);
         Log.d(TAG, "getLastForecast: " + mForecast.getTimezone());
         return mForecast;
