@@ -97,12 +97,36 @@ public class MaMeteoUtils {
         return new Forecast();
     }
 
-    public static String fahrenheitToCelsius(double temperatureInFahrenheit) {
-        double celsius = (temperatureInFahrenheit - 32) / 1.8;
-        return String.valueOf(new DecimalFormat("#").format(celsius)) + " C°";
+    public static String formatToCelsius(double temperature) {
+        return String.valueOf(new DecimalFormat("#").format(temperature)) + " C°";
     }
 
-    public static int getIconByName(Context context, String icon) {
+    public static int getDailyIconByName(Context context, String icon) {
+        switch (icon) {
+            case "clear-day":
+                return R.drawable.ic_monocolor_clear_day;
+            case "clear-night":
+                return R.drawable.ic_monocolor_clear_night;
+            case "rain":
+                return R.drawable.ic_monocolor_rain;
+            case "snow":
+                return R.drawable.ic_monocolor_snow;
+            case "wind":
+                return R.drawable.ic_wind;
+            case "fog":
+                return R.drawable.ic_monocolor_fog;
+            case "cloudy":
+                return R.drawable.ic_monocolor_cloudy;
+            case "partly-cloudy-day":
+                return R.drawable.ic_monocolor_partly_cloudy_day;
+            case "partly-cloudy-night":
+                return R.drawable.ic_monocolor_partly_cloudy_night;
+            default:
+                return R.drawable.ic_monocolor_clear_day;
+        }
+    }
+
+    public static int getHourlyIconByName(Context context, String icon) {
         switch (icon) {
             case "clear-day":
                 return R.drawable.ic_clear_day;

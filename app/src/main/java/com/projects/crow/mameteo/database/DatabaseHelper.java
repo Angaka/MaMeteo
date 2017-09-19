@@ -7,6 +7,7 @@ import com.projects.crow.mameteo.database.models.Forecast;
 import com.projects.crow.mameteo.utils.MaMeteoUtils;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -51,7 +52,7 @@ public class DatabaseHelper {
 
     public Forecast getForecast(Context context, double latitude, double longitude) {
         try {
-            mForecast = mService.getForecast(latitude, longitude).execute().body();
+            mForecast = mService.getForecast(latitude, longitude, Locale.getDefault().getLanguage(), "si").execute().body();
             Log.d(TAG, "getForecast: " + mForecast.toString());
             MaMeteoUtils.writeToFile(context, mForecast);
         } catch (IOException e) {

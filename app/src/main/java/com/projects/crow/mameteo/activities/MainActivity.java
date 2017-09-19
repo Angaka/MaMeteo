@@ -17,7 +17,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -39,6 +38,7 @@ import com.projects.crow.mameteo.utils.DateUtils;
 import com.projects.crow.mameteo.utils.EnhancedSharedPreferences;
 import com.projects.crow.mameteo.utils.MaMeteoUtils;
 import com.projects.crow.mameteo.utils.PermissionsUtils;
+import com.projects.crow.mameteo.utils.SpacesItemDecoration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,10 +59,11 @@ public class MainActivity extends AppCompatActivity
     private TextView mTvWindspeed;
     private TextView mTvTemperature;
 
-    private TextView mTvPeriod;
     private RecyclerView mRvDaily;
+    private RecyclerView mRvHourly;
 
-    private PeriodAdapter mPeriodAdapter;
+    private PeriodAdapter mDailyAdapter;
+    private PeriodAdapter mHourlyAdapter;
 
     private Snackbar mSnackBarPermissions;
 
@@ -86,15 +87,19 @@ public class MainActivity extends AppCompatActivity
         mTvWindspeed = findViewById(R.id.text_view_windspeed);
         mTvTemperature = findViewById(R.id.text_view_temperature);
 
-        mTvPeriod = findViewById(R.id.text_view_period);
-        mTvPeriod.setText(MaMeteoUtils.HOURLY);
         mRvDaily = findViewById(R.id.recycler_view_daily);
-        mPeriodAdapter = new PeriodAdapter(this, new ArrayList<Datum>(), MaMeteoUtils.HOURLY);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        mRvDaily.setLayoutManager(layoutManager);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, layoutManager.getOrientation());
-        mRvDaily.addItemDecoration(dividerItemDecoration);
-        mRvDaily.setAdapter(mPeriodAdapter);
+        mDailyAdapter = new PeriodAdapter(this, new ArrayList<Datum>(), MaMeteoUtils.DAILY);
+        LinearLayoutManager dailyLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        mRvDaily.setLayoutManager(dailyLayoutManager);
+        SpacesItemDecoration itemDecoration = new SpacesItemDecoration(30);
+        mRvDaily.addItemDecoration(itemDecoration);
+        mRvDaily.setAdapter(mDailyAdapter);
+
+        mRvHourly = findViewById(R.id.recycler_view_hourly);
+        mHourlyAdapter = new PeriodAdapter(this, new ArrayList<Datum>(), MaMeteoUtils.HOURLY);
+        LinearLayoutManager hourlyLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        mRvHourly.setLayoutManager(hourlyLayoutManager);
+        mRvHourly.setAdapter(mHourlyAdapter);
 
         mSnackBarPermissions = Snackbar
                 .make(getWindow().getDecorView().getRootView(), R.string.permissions_request, Snackbar.LENGTH_INDEFINITE)
@@ -222,12 +227,13 @@ public class MainActivity extends AppCompatActivity
 
     private void updateUI(Forecast forecast) {
         mTvLocation.setText(forecast.getTimezone());
-        mIvIcon.setImageResource(MaMeteoUtils.getIconByName(this, forecast.getCurrently().getIcon()));
+        mIvIcon.setImageResource(MaMeteoUtils.getHourlyIconByName(this, forecast.getCurrently().getIcon()));
         mTvSummary.setText(forecast.getCurrently().getSummary());
 //        mTvWindspeed = findViewById(R.id.text_view_windspeed);
-        mTvTemperature.setText(MaMeteoUtils.fahrenheitToCelsius(forecast.getCurrently().getTemperature()));
+        mTvTemperature.setText(MaMeteoUtils.formatToCelsius(forecast.getCurrently().getTemperature()));
 
-        mPeriodAdapter.updateDatas(forecast.getHourly().getData());
+        mDailyAdapter.updateDatas(forecast.getDaily().getData().subList(1, 6));
+        mHourlyAdapter.updateDatas(forecast.getHourly().getData().subList(0, 23));
     }
 
     @Override

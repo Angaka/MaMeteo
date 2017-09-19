@@ -15,13 +15,13 @@ public class DateUtils {
 
     private static final String TAG = "DateUtils";
 
-    public static String convertTimestampInHour(long timestamp) {
+    public static String convertTimestampInDateFormat(long timestamp, String format) {
         Calendar calendar = Calendar.getInstance();
         TimeZone tz = TimeZone.getDefault();
         calendar.setTimeInMillis(timestamp * 1000);
         calendar.add(Calendar.MILLISECOND, tz.getOffset(calendar.getTimeInMillis()));
         Date dateHour = calendar.getTime();
-        DateFormat sdf = new SimpleDateFormat("HH:mm");
+        DateFormat sdf = new SimpleDateFormat(format);
         return sdf.format(dateHour);
     }
 

@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_margin="10dp"
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
@@ -10,27 +9,24 @@
         android:id="@+id/image_view_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_partly_cloudy_day" />
+        android:src="@drawable/ic_monocolor_clear_day" />
 
     <TextView
         android:id="@+id/text_view_temperature"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
+        android:layout_margin="5dp"
         android:text="0°"
         android:textAlignment="center"
         android:textColor="@color/colorPrimaryDark"
-        android:textSize="@dimen/default_text_size"
-        android:textStyle="bold" />
+        android:textSize="@dimen/default_text_size" />
 
     <TextView
-        android:id="@+id/text_view_hour"
+        android:id="@+id/text_view_day"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-medium"
-        android:text="Hour"
-        android:textAllCaps="true"
+        android:text="Day"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="@dimen/small_text_size" />
-
 </LinearLayout>
