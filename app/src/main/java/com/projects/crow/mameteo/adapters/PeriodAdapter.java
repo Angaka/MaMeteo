@@ -78,7 +78,7 @@ public class PeriodAdapter extends RecyclerView.Adapter<PeriodAdapter.PeriodView
     public void onBindViewHolder(PeriodAdapter.PeriodViewHolder holder, int position) {
         Datum data = mDatas.get(position);
 
-        holder.mIvIcon.setImageResource(MaMeteoUtils.getDailyIconByName(mContext, data.getIcon()));
+        holder.mIvIcon.setImageResource(MaMeteoUtils.getIconByName(data.getIcon()));
         switch (mPeriod) {
             case MaMeteoUtils.DAILY:
                 holder.mTvTemperature.setText(MaMeteoUtils.formatToCelsius(data.getTemperatureMax()));
@@ -87,8 +87,8 @@ public class PeriodAdapter extends RecyclerView.Adapter<PeriodAdapter.PeriodView
             case MaMeteoUtils.HOURLY:
                 holder.mTvTemperature.setText(MaMeteoUtils.formatToCelsius(data.getTemperature()));
                 holder.mTvHour.setText(DateUtils.convertTimestampInDateFormat(data.getTime(), "HH:mm"));
-                holder.mTvWindSpeed.setText(String.valueOf(data.getWindSpeed()));
-                holder.mTvHumidity.setText(String.valueOf(data.getHumidity()));
+                holder.mTvWindSpeed.setText(MaMeteoUtils.windspeedFormat(data.getWindSpeed()));
+                holder.mTvHumidity.setText(MaMeteoUtils.percentageFormat(data.getHumidity()));
                 break;
         }
     }

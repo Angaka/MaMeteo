@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.text.DecimalFormat;
+import java.util.Locale;
 
 /**
  * Created by Venom on 10/09/2017.
@@ -101,7 +102,15 @@ public class MaMeteoUtils {
         return String.valueOf(new DecimalFormat("#").format(temperature)) + " C°";
     }
 
-    public static int getDailyIconByName(Context context, String icon) {
+    public static String windspeedFormat(float windspeed) {
+        return String.format(Locale.getDefault(), "%.2f MPH", windspeed);
+    }
+
+    public static String percentageFormat(float value) {
+        return String.format(Locale.getDefault(), "%.2f", value) + " %";
+    }
+
+    public static int getIconByName(String icon) {
         switch (icon) {
             case "clear-day":
                 return R.drawable.ic_monocolor_clear_day;
@@ -111,8 +120,6 @@ public class MaMeteoUtils {
                 return R.drawable.ic_monocolor_rain;
             case "snow":
                 return R.drawable.ic_monocolor_snow;
-            case "wind":
-                return R.drawable.ic_wind;
             case "fog":
                 return R.drawable.ic_monocolor_fog;
             case "cloudy":
@@ -123,31 +130,6 @@ public class MaMeteoUtils {
                 return R.drawable.ic_monocolor_partly_cloudy_night;
             default:
                 return R.drawable.ic_monocolor_clear_day;
-        }
-    }
-
-    public static int getHourlyIconByName(Context context, String icon) {
-        switch (icon) {
-            case "clear-day":
-                return R.drawable.ic_clear_day;
-            case "clear-night":
-                return R.drawable.ic_clear_night;
-            case "rain":
-                return R.drawable.ic_rain;
-            case "snow":
-                return R.drawable.ic_snow;
-            case "wind":
-                return R.drawable.ic_wind;
-            case "fog":
-                return R.drawable.ic_fog;
-            case "cloudy":
-                return R.drawable.ic_cloudy;
-            case "partly-cloudy-day":
-                return R.drawable.ic_partly_cloudy_day;
-            case "partly-cloudy-night":
-                return R.drawable.ic_partly_cloudy_night;
-            default:
-                return R.drawable.ic_clear_day;
         }
     }
 }

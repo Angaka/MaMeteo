@@ -21,7 +21,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,9 +53,9 @@ public class MainActivity extends AppCompatActivity
     private EnhancedSharedPreferences mPreferences;
 
     private TextView mTvLocation;
-    private ImageView mIvIcon;
     private TextView mTvSummary;
     private TextView mTvWindspeed;
+    private TextView mTvHumidity;
     private TextView mTvTemperature;
 
     private RecyclerView mRvDaily;
@@ -82,9 +81,9 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         mTvLocation = findViewById(R.id.text_view_location);
-        mIvIcon = findViewById(R.id.image_view_icon);
         mTvSummary = findViewById(R.id.text_view_summary);
         mTvWindspeed = findViewById(R.id.text_view_windspeed);
+        mTvHumidity = findViewById(R.id.text_view_humidity);
         mTvTemperature = findViewById(R.id.text_view_temperature);
 
         mRvDaily = findViewById(R.id.recycler_view_daily);
@@ -227,10 +226,11 @@ public class MainActivity extends AppCompatActivity
 
     private void updateUI(Forecast forecast) {
         mTvLocation.setText(forecast.getTimezone());
-        mIvIcon.setImageResource(MaMeteoUtils.getHourlyIconByName(this, forecast.getCurrently().getIcon()));
-        mTvSummary.setText(forecast.getCurrently().getSummary());
-//        mTvWindspeed = findViewById(R.id.text_view_windspeed);
         mTvTemperature.setText(MaMeteoUtils.formatToCelsius(forecast.getCurrently().getTemperature()));
+        mTvSummary.setCompoundDrawablesWithIntrinsicBounds(MaMeteoUtils.getIconByName(forecast.getCurrently().getIcon()), 0, 0, 0);
+        mTvSummary.setText(forecast.getCurrently().getSummary());
+        mTvWindspeed.setText(MaMeteoUtils.windspeedFormat(forecast.getCurrently().getWindSpeed()));
+        mTvHumidity.setText(MaMeteoUtils.percentageFormat(forecast.getCurrently().getHumidity()));
 
         mDailyAdapter.updateDatas(forecast.getDaily().getData().subList(1, 6));
         mHourlyAdapter.updateDatas(forecast.getHourly().getData().subList(0, 23));
