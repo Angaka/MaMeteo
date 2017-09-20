@@ -19,7 +19,10 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,7 +55,7 @@ public class MainActivity extends AppCompatActivity
 
     private EnhancedSharedPreferences mPreferences;
 
-    private TextView mTvLocation;
+    private Toolbar mToolbar;
     private TextView mTvSummary;
     private TextView mTvWindspeed;
     private TextView mTvHumidity;
@@ -80,7 +83,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTvLocation = findViewById(R.id.text_view_location);
+        mToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
         mTvSummary = findViewById(R.id.text_view_summary);
         mTvWindspeed = findViewById(R.id.text_view_windspeed);
         mTvHumidity = findViewById(R.id.text_view_humidity);
@@ -135,6 +139,24 @@ public class MainActivity extends AppCompatActivity
         super.onDestroy();
         if (mCheckIfReceiverRegistered)
             LocalBroadcastManager.getInstance(this).unregisterReceiver(mUpdateDataReceiver);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+                startAlarm();
+                break;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void startAlarm() {
@@ -225,7 +247,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateUI(Forecast forecast) {
-        mTvLocation.setText(forecast.getTimezone());
+        mToolbar.setTitle(forecast.getTimezone());
         mTvTemperature.setText(MaMeteoUtils.formatToCelsius(forecast.getCurrently().getTemperature()));
         mTvSummary.setCompoundDrawablesWithIntrinsicBounds(MaMeteoUtils.getIconByName(forecast.getCurrently().getIcon()), 0, 0, 0);
         mTvSummary.setText(forecast.getCurrently().getSummary());

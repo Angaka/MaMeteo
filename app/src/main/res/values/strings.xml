@@ -7,4 +7,6 @@
 
     <string name="windspeed">Windspeed</string>
     <string name="humidity">Humidity</string>
+
+    <string name="action_refresh">Refresh</string>
 </resources>

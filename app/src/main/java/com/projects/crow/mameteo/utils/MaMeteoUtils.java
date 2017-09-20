@@ -107,7 +107,7 @@ public class MaMeteoUtils {
     }
 
     public static String percentageFormat(float value) {
-        return String.format(Locale.getDefault(), "%.2f", value) + " %";
+        return String.valueOf(Math.round(value * 100)) + " %";
     }
 
     public static int getIconByName(String icon) {
