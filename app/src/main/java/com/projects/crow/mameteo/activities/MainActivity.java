@@ -1,6 +1,8 @@
 package com.projects.crow.mameteo.activities;
 
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -16,14 +18,19 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -151,7 +158,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
-                startAlarm();
+                updateLocation();
                 break;
             default:
                 break;
@@ -159,16 +166,41 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    private void initNotification(Forecast forecast) {
+        RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.view_notification);
+        contentView.setImageViewResource(R.id.image_view_icon, MaMeteoUtils.getIconByName(forecast.getCurrently().getIcon()));
+        contentView.setTextViewText(R.id.text_view_summary, forecast.getCurrently().getSummary());
+        contentView.setTextViewText(R.id.text_view_location, forecast.getTimezone());
+        contentView.setTextViewText(R.id.text_view_temperature, MaMeteoUtils.formatToCelsius(forecast.getCurrently().getTemperature()));
+
+        Intent intent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Notification notification = new Notification.Builder(this)
+                .setSmallIcon(MaMeteoUtils.getIconByName(forecast.getCurrently().getIcon()))
+                .setContent(contentView)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(false)
+                .setOngoing(true)
+                .build();
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if (notificationManager != null) {
+            notificationManager.notify(0, notification);
+        }
+    }
+
     private void startAlarm() {
         if (isAllPermissionsAccepted()) {
             updateLocation();
             Intent alarm = new Intent(MainActivity.this, WeatherBootReceiver.class);
             boolean alarmRunning = (PendingIntent.getBroadcast(this, 0, alarm, PendingIntent.FLAG_NO_CREATE) != null);
+            Log.d(TAG, "startAlarm: " + alarmRunning);
             if (!alarmRunning) {
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, alarm, PendingIntent.FLAG_UPDATE_CURRENT);
                 AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
                 if (alarmManager != null) {
-                    alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, DateUtils.getNextHour().getTime(), AlarmManager.INTERVAL_HOUR, pendingIntent);
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, DateUtils.getNextHour().getTime(), AlarmManager.INTERVAL_HOUR, pendingIntent);
                 }
             }
         } else {
@@ -308,16 +340,14 @@ public class MainActivity extends AppCompatActivity
         protected Forecast doInBackground(Void... voids) {
             DatabaseHelper db = DatabaseHelper.getInstance();
 
-            if (!isLocationEnabled()) {
-                Log.d(TAG, "doInBackground: ");
+            if (!isLocationEnabled())
                 return db.getLastForecast(mContext);
-            }
-            Log.d(TAG, "doInBackground: lat long " + mLatitude +  " " + mLongitude);
             return db.getForecast(mContext, mLatitude, mLongitude);
         }
 
         @Override
         protected void onPostExecute(Forecast forecast) {
+            initNotification(forecast);
             updateUI(forecast);
         }
     }

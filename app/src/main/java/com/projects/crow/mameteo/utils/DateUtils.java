@@ -25,8 +25,8 @@ public class DateUtils {
         return sdf.format(dateHour);
     }
 
-    public static Date getCurrentTime() {
-        return Calendar.getInstance().getTime();
+    public static long getCurrentTimeInLong() {
+        return Calendar.getInstance().getTimeInMillis() / 1000;
     }
 
     public static Date getNextHour() {
@@ -38,9 +38,7 @@ public class DateUtils {
         Calendar c = new GregorianCalendar();
         c.setTime(d);
 
-        if (c.get(Calendar.MINUTE) >= 30)
-            c.add(Calendar.HOUR, 1);
-
+        c.add(Calendar.HOUR, 1);
         c.set(Calendar.MINUTE, 0);
         c.set(Calendar.SECOND, 0);
 

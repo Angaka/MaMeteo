@@ -4,5 +4,6 @@
 
     <dimen name="small_text_size">13sp</dimen>
     <dimen name="default_text_size">16sp</dimen>
+    <dimen name="big_text_size">23sp</dimen>
     <dimen name="currently_temperature_text_size">65sp</dimen>
 </resources>
