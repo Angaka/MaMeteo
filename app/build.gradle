@@ -5,11 +5,12 @@ android {
     buildToolsVersion "26.0.0"
     defaultConfig {
         applicationId "com.projects.crow.mameteo"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "API_KEY", API_KEY)
     }
     buildTypes {
         release {

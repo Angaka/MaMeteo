@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -21,12 +22,8 @@ public class DateUtils {
         calendar.setTimeInMillis(timestamp * 1000);
         calendar.add(Calendar.MILLISECOND, tz.getOffset(calendar.getTimeInMillis()));
         Date dateHour = calendar.getTime();
-        DateFormat sdf = new SimpleDateFormat(format);
+        DateFormat sdf = new SimpleDateFormat(format, Locale.getDefault());
         return sdf.format(dateHour);
-    }
-
-    public static long getCurrentTimeInLong() {
-        return Calendar.getInstance().getTimeInMillis() / 1000;
     }
 
     public static Date getNextHour() {

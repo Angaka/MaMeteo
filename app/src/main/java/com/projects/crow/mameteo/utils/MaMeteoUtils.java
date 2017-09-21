@@ -1,14 +1,17 @@
 package com.projects.crow.mameteo.utils;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
-import android.location.LocationManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.content.Intent;
+import android.widget.RemoteViews;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.projects.crow.mameteo.R;
-import com.projects.crow.mameteo.database.models.Forecast;
+import com.projects.crow.mameteo.activities.MainActivity;
+import com.projects.crow.mameteo.networks.models.Forecast;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -18,6 +21,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.text.DecimalFormat;
 import java.util.Locale;
+
+import static android.content.Context.NOTIFICATION_SERVICE;
 
 /**
  * Created by Venom on 10/09/2017.
@@ -33,31 +38,13 @@ public class MaMeteoUtils {
     public static final String[] PERMISSIONS = {"android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"};
     public static final int REQUEST_CODE = 200;
 
-    public static final String CITYNAME = "cityName";
-    public static final String STATENAME = "stateName";
-    public static final String COUNTRYNAME = "countryName";
     public static final String LATITUDE = "latitude";
     public static final String LONGITUDE = "longitude";
 
-    public static final String CURRENTLY = "currently";
     public static final String DAILY = "daily";
     public static final String HOURLY = "hourly";
 
     public static final String UPDATE_FORECAST = "updateForecast";
-
-    public static boolean isInternetConnectionAvailable(Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = null;
-        if (connectivityManager != null) {
-            networkInfo = connectivityManager.getActiveNetworkInfo();
-        }
-        return networkInfo != null && networkInfo.isConnectedOrConnecting();
-    }
-
-    public static boolean isProviderEnabled(Context context, String providerType) {
-        LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        return lm!= null && lm.isProviderEnabled(providerType);
-    }
 
     public static void writeToFile(Context context, Forecast forecast) {
         try {
@@ -130,6 +117,30 @@ public class MaMeteoUtils {
                 return R.drawable.ic_monocolor_partly_cloudy_night;
             default:
                 return R.drawable.ic_monocolor_clear_day;
+        }
+    }
+
+    public static void initNotification(Context context, Forecast forecast) {
+        RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.view_notification);
+        contentView.setImageViewResource(R.id.image_view_icon, MaMeteoUtils.getIconByName(forecast.getCurrently().getIcon()));
+        contentView.setTextViewText(R.id.text_view_summary, forecast.getCurrently().getSummary());
+        contentView.setTextViewText(R.id.text_view_location, forecast.getTimezone());
+        contentView.setTextViewText(R.id.text_view_temperature, MaMeteoUtils.formatToCelsius(forecast.getCurrently().getTemperature()));
+
+        Intent intent = new Intent(context, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Notification notification = new Notification.Builder(context)
+                .setSmallIcon(MaMeteoUtils.getIconByName(forecast.getCurrently().getIcon()))
+                .setContent(contentView)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(false)
+                .setOngoing(true)
+                .build();
+
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        if (notificationManager != null) {
+            notificationManager.notify(0, notification);
         }
     }
 }

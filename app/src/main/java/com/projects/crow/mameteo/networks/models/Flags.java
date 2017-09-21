@@ -1,4 +1,4 @@
-package com.projects.crow.mameteo.database.models;
+package com.projects.crow.mameteo.networks.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

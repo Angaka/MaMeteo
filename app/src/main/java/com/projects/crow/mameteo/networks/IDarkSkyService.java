@@ -1,6 +1,6 @@
-package com.projects.crow.mameteo.database;
+package com.projects.crow.mameteo.networks;
 
-import com.projects.crow.mameteo.database.models.Forecast;
+import com.projects.crow.mameteo.networks.models.Forecast;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

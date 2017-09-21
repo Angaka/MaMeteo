@@ -1,4 +1,4 @@
-package com.projects.crow.mameteo.utils;
+package com.projects.crow.mameteo.utils.services;
 
 
 import android.content.SharedPreferences;

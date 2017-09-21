@@ -1,8 +1,7 @@
-package com.projects.crow.mameteo.utils;
+package com.projects.crow.mameteo.utils.services;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.os.Build;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,27 +10,20 @@ import java.util.List;
  * Created by Venom on 08/09/2017.
  */
 
-public class PermissionsUtils {
+public class PermissionsService {
 
-    private static final String TAG = "PermissionsUtils";
+    private static final String TAG = "PermissionsService";
 
-    private static Context mContext;
+    private Context mContext;
     private static EnhancedSharedPreferences mPreferences;
 
-    public PermissionsUtils(Context context, EnhancedSharedPreferences preferences) {
+    public PermissionsService(Context context, EnhancedSharedPreferences preferences) {
         mContext = context;
         mPreferences = preferences;
     }
 
-    private boolean canMakeSmore() {
-        return (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1);
-    }
-
     private boolean hasPermission(String permission) {
-        if (canMakeSmore()) {
-            return (mContext.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED);
-        }
-        return true;
+        return (mContext.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED);
     }
 
     private boolean shouldWeAsk(String permission) {

@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.projects.crow.mameteo.R;
-import com.projects.crow.mameteo.database.models.Datum;
+import com.projects.crow.mameteo.networks.models.Datum;
 import com.projects.crow.mameteo.utils.DateUtils;
 import com.projects.crow.mameteo.utils.MaMeteoUtils;
 
@@ -69,13 +69,13 @@ public class PeriodAdapter extends RecyclerView.Adapter<PeriodAdapter.PeriodView
     }
 
     @Override
-    public PeriodAdapter.PeriodViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public PeriodViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(mLayout.get(mPeriod), parent, false);
         return new PeriodViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(PeriodAdapter.PeriodViewHolder holder, int position) {
+    public void onBindViewHolder(PeriodViewHolder holder, int position) {
         Datum data = mDatas.get(position);
 
         holder.mIvIcon.setImageResource(MaMeteoUtils.getIconByName(data.getIcon()));

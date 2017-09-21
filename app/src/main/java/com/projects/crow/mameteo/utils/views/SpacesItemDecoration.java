@@ -1,4 +1,4 @@
-package com.projects.crow.mameteo.utils;
+package com.projects.crow.mameteo.utils.views;
 
 import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;

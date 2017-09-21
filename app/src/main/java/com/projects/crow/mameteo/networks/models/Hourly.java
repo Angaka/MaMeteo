@@ -1,4 +1,4 @@
-package com.projects.crow.mameteo.database.models;
+package com.projects.crow.mameteo.networks.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -10,7 +10,8 @@ import java.util.List;
  * Created by Venom on 09/09/2017.
  */
 
-public class Daily {
+public class Hourly {
+
     @SerializedName("summary")
     @Expose
     private String summary = "";
@@ -47,7 +48,7 @@ public class Daily {
 
     @Override
     public String toString() {
-        return "Daily{" +
+        return "Hourly{" +
                 "summary='" + summary + '\'' +
                 ", icon='" + icon + '\'' +
                 ", data=" + data +
