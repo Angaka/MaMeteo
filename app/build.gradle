@@ -35,4 +35,5 @@ dependencies {
     compile group: 'com.squareup.retrofit2', name: 'converter-gson', version: '2.3.0'
     compile 'com.squareup.okhttp3:okhttp:3.9.0'
     compile 'com.google.code.gson:gson:2.8.1'
+    compile 'com.github.medyo:android-about-page:1.2.1'
 }

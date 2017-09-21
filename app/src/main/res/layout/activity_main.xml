@@ -100,6 +100,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:orientation="vertical"
+        android:scrollbars="vertical"
+        android:scrollbarSize="2dp"
+        android:scrollbarThumbVertical="@color/colorPrimary"
         android:paddingLeft="@dimen/padding_mameteo"
         android:paddingRight="@dimen/padding_mameteo" />
 </LinearLayout>

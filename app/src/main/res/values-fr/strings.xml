@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">MaMeteo</string>
+    <string name="app_description">MaMeteo est une simple application de prévision météo de votre position actuelle. L\'API de Dark Sky est utilisée pour obtenir les dernières prévisions. Des mises à jour sont à prévoir !</string>
 
     <string name="permissions_request">Vous devez accepter une ou plusieurs permissions</string>
     <string name="see_permissions">Voir permissions</string>
@@ -9,4 +10,5 @@
     <string name="humidity">Humidité</string>
 
     <string name="action_refresh">Rafraichir</string>
+    <string name="action_about">A propos</string>
 </resources>

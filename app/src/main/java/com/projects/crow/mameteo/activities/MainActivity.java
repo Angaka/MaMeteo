@@ -115,6 +115,10 @@ public class MainActivity extends AppCompatActivity
             case R.id.action_refresh:
                 mLocationService.updateLocation();
                 break;
+            case R.id.action_about:
+                Intent aboutIntent = new Intent(this, AboutActivity.class);
+                startActivity(aboutIntent);
+                break;
             default:
                 break;
         }

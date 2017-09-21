@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">MaMeteo</string>
+    <string name="app_description">MaMeteo is a simple application to get weather forecasts of your current position. Dark Sky API is used to get the latest forecasts. More updates are coming soon !</string>
 
     <string name="permissions_request">You need to accept some permissions</string>
     <string name="see_permissions">See permissions</string>
@@ -9,4 +10,6 @@
     <string name="humidity">Humidity</string>
 
     <string name="action_refresh">Refresh</string>
+    <string name="action_about">About</string>
+
 </resources>
